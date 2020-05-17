@@ -11,32 +11,3 @@ const connection = mysql.createConnection({
 
 });
 
-// Wrap connection.connect() in a promise!
-async function connect(){
-    return new Promise((resolve, reject)=>{
-        connection.connect(err =>{
-            if (err) reject(err); //Connection Failed
-            else resolve(); //Connection Succeseed
-        });
-    });
-}
-
-// Wrap connection.query() in a promise!
-async function query(command, values){
-    return new Promise((resolve, reject)=>{
-        connection.query(command,values,(err, res)=>{
-            if(err) reject(err);
-            else resolve(res);
-        });
-    });
-}
-
-// This is where everything happens.
-async function main(){
-    await connect();
-    console.log("connected!", connection.threadId);
-
-
-}
-// Start the app.
-main().catch(err=> console.log(err));
