@@ -51,7 +51,17 @@ while(true){
             type: 'list',
             message:'What would you like to add?',
             cooices:['Department', 'roles', 'employees'],
-        }),
+        });
+         if(addEmployee === 'Department') {
+             const answer = await inquirer.prompt({
+                 name: 'name',
+                 type: 'input',
+                 message: 'Department name You want to add?'
+             }
+
+             )
+
+         }
     }
     
 }
