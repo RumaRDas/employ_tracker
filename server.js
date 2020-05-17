@@ -46,21 +46,24 @@ while(true){
 
     });
     if(employee_tracker === 'Add'){
-        const addEmployee = await inquirer.prompt({
+        const {addEmployee}= await inquirer.prompt({
             name: 'addEmployee',
             type: 'list',
             message:'What would you like to add?',
-            cooices:['Department', 'roles', 'employees'],
+            choices:['Department', 'roles', 'employees'],
         });
          if(addEmployee === 'Department') {
              const answer = await inquirer.prompt({
                  name: 'name',
                  type: 'input',
                  message: 'Department name You want to add?'
-             }
-
-             )
-
+             });
+             await query(`
+             INSERT INTO department(name)
+             VALUES(?)`,
+             [answer.name]
+             );
+console.log ("Great, it's now on auction.\n");
          }
     }
     
