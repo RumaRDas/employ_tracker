@@ -31,3 +31,30 @@ async function query(command, values){
     });
 }
 
+// This is where everything happens.
+async function main(){
+    await connect();
+    console.log("connected!", connection.threadId);
+
+// Forever! Keep asking questions, or at least until we ask to 'exit'.
+while(true){ 
+    const {employee_tracker} = await inquirer.prompt({
+        name: 'employee_tracker',
+        type:'list',
+        message: 'What would you like to do ?',
+        choices: ['Add','View', 'Update','Delete'],
+
+    });
+    if(employee_tracker === 'Add'){
+        const addEmployee = await inquirer.prompt({
+            name: 'addEmployee',
+            type: 'list',
+            message:'What would you like to add?',
+            cooices:['Department', 'roles', 'employees'],
+        }),
+    }
+    
+}
+}
+// Start the app.
+main().catch(err=> console.log(err));
