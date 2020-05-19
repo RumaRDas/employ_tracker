@@ -33,7 +33,7 @@ CREATE TABLE employees (
     FOREIGN KEY (roles_id)
     REFERENCES roles(id),
     FOREIGN KEY (manager_id)
-    REFERENCES department(id)
+    REFERENCES employees(id)
 ) ENGINE=INNODB;
 
 COMMIT;

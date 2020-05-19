@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const utils = require('util');
-const cTable = require('console.table');
+//const cTable = require('console.table');
 
 // DB connection for this session.
 const connection = mysql.createConnection({
@@ -37,47 +37,39 @@ connection.connect(function (err) {
 
 });
 
-
-
-// connection.query("SELECT * FROM roles", function (err, res) {
-//     if (err) throw err;
-//     listRoles = res.map(role => ({ name: role.title, value: role.id }));
-//     // console.log("Roles")
-//     // console.table(listRoles);
-// });
-
-// connection.query("SELECT * FROM employees", function (err, res) {
-//     if (err) throw err;
-//     listEmployee = res.map(emp => ({
-//         name: `${emp.first_name}${emp.last_name}`,
-//         value: emp.id
-//     }));
-    // console.log("Employee")
-    // console.table(listEmployee);
-// });
-const roleList =  async function(){
-    const roleresults = await query(`SELECT  * from department `);
-    const choices =  roleresults.map(roles => {
-        //For each department returned from the SQL query this will create an object that will act as a choice for inquirer
+const employeeList = async function () {
+    const employeeresults = await query(`SELECT  * from employees `);
+    const choices = employeeresults.map(emp => {
         return {
-                 name: roles.title,
-                 value: roles.id
-                } 
+            name: `${emp.first_name}${emp.last_name}`,
+            value: emp.id
+        }
+    })
+    return choices;
+}
+const roleList = async function () {
+    const roleresults = await query(`SELECT  * from roles `);
+    const choices = roleresults.map(roles => {
+        return {
+            name: roles.title,
+            value: roles.id
+        }
     })
     return choices;
 }
 
-const departmentList =  async function(){
+const departmentList = async function () {
     const departmentresults = await query(`SELECT  * from department `);
-    const choices =  departmentresults.map(department => {
-        //For each department returned from the SQL query this will create an object that will act as a choice for inquirer
+    const choices = departmentresults.map(department => {
         return {
-                 name: department.name,
-                 value: department.id
-                } 
+            name: department.name,
+            value: department.id
+        }
     })
     return choices;
 }
+
+
 // This is where everything happens.
 async function main() {
 
@@ -89,7 +81,7 @@ async function main() {
             name: 'employee_tracker',
             type: 'list',
             message: 'What would you like to do ?',
-            choices: ['Add', 'View', 'Update', 'Delete','Exit'],
+            choices: ['Add', 'View', 'Update', 'Delete', 'Exit'],
 
         });
         if (employee_tracker === 'Add') {
@@ -108,7 +100,7 @@ async function main() {
                 await query(`INSERT INTO department(name) VALUES(?)`,
                     [answer.name]
                 );
-                console.log("Great, it's now on Department database.\n");
+                console.log("-----Department added!-----\n");
             }
             else if (addEmployee === 'Role') {
                 const answer = await inquirer.prompt([{
@@ -125,44 +117,49 @@ async function main() {
                 {
                     name: 'department_id',
                     type: 'list',
-                    message: 'Whats the id of that role?',
+                    message: 'Which Department you want add ?',
                     choices: departmentList
-
-                }
-            ]);
+                },
+                ]);
                 await query(`INSERT INTO roles(title, salary, department_id)VALUES(?,?,?)`,
                     [answer.title, answer.salary, answer.department_id]
                 );
-                console.log("Great, it's now on auction.\n");
+                console.log("-----Role added!-----\n");//
+
+
             }
             else if (addEmployee === 'Employee') {
                 const answer = await inquirer.prompt([{
-                    name: 'title',
+                    name: 'first_name',
                     type: 'input',
-                    message: 'Whats Roles You want to add?'
+                    message: 'First Name of employee'
                 },
                 {
-                    name: 'salary',
+                    name: 'last_name',
                     type: 'input',
-                    message: 'Whats the salary of that role?'
-
+                    message: 'Last Name of employee'
                 },
                 {
-                    name: 'department_id',
+                    name: 'roles',
                     type: 'list',
-                    message: 'Whats the id of that role?',
-                    choices: departmentList
+                    message: 'Which Roles you want add ?',
+                    choices: roleList
+                },
+                {
+                    name: 'manager_id',
+                    type: 'list',
+                    message: 'Which Department you want add ?',
+                    choices: employeeList
+                },
 
-                }
-            ]);
-                await query(`INSERT INTO roles(title, salary, department_id)VALUES(?,?,?)`,
-                    [answer.title, answer.salary, answer.department_id]
+                ]);
+                await query(`INSERT INTO employees(first_name, last_name, roles_id, manager_id)VALUES(?,?,?,?)`,
+                    [answer.first_name, answer.last_name, answer.roles_id, answer.manager_id]
                 );
-                console.log("Great, it's now on auction.\n");
+                console.log("-----Employee added!-----\n");
             }
         }
-
-        else if(employee_tracker === 'View'){
+        else if (employee_tracker === 'View') {
             const { viewEmployee } = await inquirer.prompt({
                 name: 'viewEmployee',
                 type: 'list',
@@ -173,19 +170,52 @@ async function main() {
                 const department = await query(`SELECT  * from department`);
                 console.table(department);
             }
-            else  if (viewEmployee === 'Roles') {
-                const roles = await query(`SELECT roles.id, roles.title, roles.salary, department.name from roles  inner join department on roles.department_id = department.id `);
+            else if (viewEmployee === 'Roles') {
+                const roles = await query(`SELECT roles.id, roles.title, roles.salary, department.name FROM roles  inner join department on roles.department_id = department.id `);
                 console.table(roles);
             }
-            else  if (viewEmployee === 'Employees') {
-                const employees = await query(`SELECT  * from employees`);
+            else if (viewEmployee === 'Employees') {
+                const employees = await query(
+                    `SELECT first_name,last_name,title,salary, name FROM employees e join roles r ON e.manager_id=r.id join department d ON r.id=d.id`);
                 console.table(employees);
             }
-                   
-            
-                
+
+
+
         }
-       
+        else if (employee_tracker === 'Delete') {
+            const { deleteEmployee } = await inquirer.prompt({
+                name: 'deleteEmployee',
+                type: 'list',
+                message: 'What Do you Want to Delete?',
+                choices: ['Department', 'Roles', 'Employees'],
+            });
+
+            if (deleteEmployee === 'Department') {
+                const answer = await inquirer.prompt(
+                {
+                    name: 'name',
+                    type: 'list',
+                    message: 'Which Department you want to Delete?',
+                    choices: departmentList
+                }
+                );
+                await query(`DELETE FROM department WHERE ?`,
+                    {name: answer.name}
+                );
+                console.log("-----Employee DELETED!-----\n");
+            }
+        }
+           
+        else if (employee_tracker === 'Exit') {
+            console.log("----------All done!------------------");
+            connection.end();
+            process.exit();
+
+
+
+        }
+
     }
 }
 // Start the app.
