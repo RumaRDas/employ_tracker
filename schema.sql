@@ -16,24 +16,24 @@ CREATE TABLE department (
 CREATE TABLE  roles(
     id INTEGER auto_increment NOT NULL,
     title VARCHAR(30) NOT NULL,
-    salary DECIMAL(7,2),
+    salary DECIMAL(10,2),
     department_id INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (department_id)
     REFERENCES department(id)
 
 )ENGINE=INNODB;
-CREATE TABLE employee (
+CREATE TABLE employees (
     id INTEGER auto_increment NOT NULL,
     first_name  VARCHAR(30) NOT NULL,
     last_name  VARCHAR(30) NOT NULL,
     roles_id INT ,
-    manager_id int,
+    manager_id INT,
     PRIMARY KEY (id),
     FOREIGN KEY (roles_id)
     REFERENCES roles(id),
     FOREIGN KEY (manager_id)
-    REFERENCES roles(id)
+    REFERENCES department(id)
 ) ENGINE=INNODB;
 
 COMMIT;
