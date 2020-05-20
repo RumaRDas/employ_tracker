@@ -180,7 +180,7 @@ async function main() {
             }
             else if (viewOption === 'Employees') {
                 const employees = await query(
-                    `SELECT first_name, last_name, title, salary, name FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`);
+                    `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`);
                 console.table(employees);
             }
 
