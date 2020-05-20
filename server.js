@@ -160,53 +160,75 @@ async function main() {
             }
         }
         else if (employee_tracker === 'View') {
-            const { viewEmployee } = await inquirer.prompt({
-                name: 'viewEmployee',
+            const { viewOption } = await inquirer.prompt({
+                name: 'viewOption',
                 type: 'list',
                 message: 'What would you like to View?',
                 choices: ['Department', 'Roles', 'Employees'],
             });
-            if (viewEmployee === 'Department') {
+            if (viewOption === 'Department') {
                 const department = await query(`SELECT  * from department`);
                 console.table(department);
             }
-            else if (viewEmployee === 'Roles') {
+            else if (viewOption === 'Roles') {
                 const roles = await query(`SELECT roles.id, roles.title, roles.salary, department.name FROM roles  inner join department on roles.department_id = department.id `);
                 console.table(roles);
             }
-            else if (viewEmployee === 'Employees') {
+            else if (viewOption === 'Employees') {
                 const employees = await query(
-                    `SELECT first_name,last_name,title,salary, name FROM employees e join roles r ON e.manager_id=r.id join department d ON r.id=d.id`);
+                    `SELECT first_name, last_name, title, salary, name FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`);
                 console.table(employees);
             }
 
-
-
         }
-        else if (employee_tracker === 'Delete') {
-            const { deleteEmployee } = await inquirer.prompt({
-                name: 'deleteEmployee',
+        else if (employee_tracker === 'Update') {
+            const { updateOption } = await inquirer.prompt({
+                name: 'updateOption',
                 type: 'list',
-                message: 'What Do you Want to Delete?',
+                message: 'What Do you Want to Update?',
                 choices: ['Department', 'Roles', 'Employees'],
             });
 
-            if (deleteEmployee === 'Department') {
-                const answer = await inquirer.prompt(
-                {
-                    name: 'name',
-                    type: 'list',
-                    message: 'Which Department you want to Delete?',
-                    choices: departmentList
-                }
-                );
-                await query(`DELETE FROM department WHERE ?`,
-                    {name: answer.name}
-                );
-                console.log("-----Employee DELETED!-----\n");
+            if (updateOption === 'Department') {
+                const answer = await inquirer.prompt([
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'Which Department you want update ?',
+                        choices: departmentList
+                    },
+                    {
+                        name: 'newName',
+                        type: 'input',
+                        message: 'Whats the new name ?',
+                    }
+                ]);
+                await query(`UPDATE department SET name=? WHERE id=?`, [answer.newName, answer.id]);
+
+                console.log("-----Department UPDATED!-----\n");
             }
         }
-           
+        else if (employee_tracker === 'Delete') {
+            const { deleteOption } = await inquirer.prompt({
+                name: 'deleteOption',
+                type: 'list',
+                message: 'What Do you Want to Delete?',
+                choices: ['Department', 'Roles', 'Employees']
+            });
+
+            if (deleteOption === 'Department') {
+                const answer = await inquirer.prompt(
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'Which Department you want Delete?',
+                        choices: departmentList
+                    }
+                );
+                await query(`DELETE FROM department WHERE id=?`, answer.id);
+                console.log("-----Department DELETED!-----\n");
+            }
+        }
         else if (employee_tracker === 'Exit') {
             console.log("----------All done!------------------");
             connection.end();
