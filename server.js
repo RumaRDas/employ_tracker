@@ -41,7 +41,7 @@ const employeeList = async function () {
     const employeeresults = await query(`SELECT  * from employees `);
     const choices = employeeresults.map(emp => {
         return {
-            name: `${emp.first_name}${emp.last_name}`,
+            name: `${emp.first_name}  ${emp.last_name}`,
             value: emp.id
         }
     })
@@ -84,6 +84,7 @@ async function main() {
             choices: ['Add', 'View', 'Update', 'Delete', 'Exit'],
 
         });
+        //Adding Department
         if (employee_tracker === 'Add') {
             const { addEmployee } = await inquirer.prompt({
                 name: 'addEmployee',
@@ -91,6 +92,7 @@ async function main() {
                 message: 'What would you like to add?',
                 choices: ['Department', 'Role', 'Employee'],
             });
+            //Adding Department
             if (addEmployee === 'Department') {
                 const answer = await inquirer.prompt({
                     name: 'name',
@@ -102,6 +104,7 @@ async function main() {
                 );
                 console.log("-----Department added!-----\n");
             }
+             //Adding Role
             else if (addEmployee === 'Role') {
                 const answer = await inquirer.prompt([{
                     name: 'title',
@@ -128,6 +131,7 @@ async function main() {
 
 
             }
+             //Adding Employee
             else if (addEmployee === 'Employee') {
                 const answer = await inquirer.prompt([{
                     name: 'first_name',
@@ -181,6 +185,7 @@ async function main() {
             }
 
         }
+        //Updating Employee List
         else if (employee_tracker === 'Update') {
             const { updateOption } = await inquirer.prompt({
                 name: 'updateOption',
@@ -206,8 +211,33 @@ async function main() {
                 await query(`UPDATE department SET name=? WHERE id=?`, [answer.newName, answer.id]);
 
                 console.log("-----Department UPDATED!-----\n");
+            } 
+            //update Employee
+            else if (updateOption === 'Employees') {
+                const answer = await inquirer.prompt([
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'First Name of employee',
+                        choices: employeeList
+                    },
+                    {    name:'newFName',
+                         type: 'input',
+                         message: 'Enter Employees First Name'
+                    },
+                    {
+                        name: 'newLName',
+                        type: 'input',
+                        message: 'Enter Last Name of employee'
+                    },
+                    
+                ]);
+                await query(`UPDATE employees SET first_name=?, last_name=? WHERE id=?`, [answer.newFName,answer.newLName, answer.id]);
+
+                console.log("-----Department UPDATED!-----\n");
             }
         }
+        //Deleting Employee List
         else if (employee_tracker === 'Delete') {
             const { deleteOption } = await inquirer.prompt({
                 name: 'deleteOption',
@@ -215,7 +245,7 @@ async function main() {
                 message: 'What Do you Want to Delete?',
                 choices: ['Department', 'Roles', 'Employees']
             });
-
+            //Deleting Department
             if (deleteOption === 'Department') {
                 const answer = await inquirer.prompt(
                     {
@@ -229,6 +259,7 @@ async function main() {
                 console.log("-----Department DELETED!-----\n");
             }
         }
+        //Exit Application
         else if (employee_tracker === 'Exit') {
             console.log("----------All done!------------------");
             connection.end();
