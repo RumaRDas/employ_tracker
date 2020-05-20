@@ -36,7 +36,7 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId);
 
 });
-
+//Getting employees
 const employeeList = async function () {
     const employeeresults = await query(`SELECT  * from employees `);
     const choices = employeeresults.map(emp => {
@@ -149,16 +149,25 @@ async function main() {
                     message: 'Which Roles you want add ?',
                     choices: roleList
                 },
+                // {
+                //     name: 'salary',
+                //     type: 'input',
+                //     message: 'Salary Amount ?',
+
+                // },
                 {
-                    name: 'manager_id',
+                    name: 'department_id',
                     type: 'list',
                     message: 'Which Department you want add ?',
-                    choices: employeeList
+                    choices: departmentList
                 },
 
                 ]);
-                await query(`INSERT INTO employees(first_name, last_name, roles_id, manager_id)VALUES(?,?,?,?)`,
-                    [answer.first_name, answer.last_name, answer.roles_id, answer.manager_id]
+                await query(
+                    `INSERT INTO employees(first_name, last_name, roles_id, manager_id)VALUES(?,?,?,?)`,
+                    [answer.first_name, answer.last_name, answer.roles, answer.department_id]
+                    
+
                 );
                 console.log("-----Employee added!-----\n");
             }
@@ -167,6 +176,7 @@ async function main() {
             const { viewOption } = await inquirer.prompt({
                 name: 'viewOption',
                 type: 'list',
+
                 message: 'What would you like to View?',
                 choices: ['Department', 'Roles', 'Employees'],
             });
@@ -180,7 +190,9 @@ async function main() {
             }
             else if (viewOption === 'Employees') {
                 const employees = await query(
-                    `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`);
+                    // `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`
+                    `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e LEFT JOIN roles r ON e.roles_id = r.id  LEFT JOIN department d ON e.roles_id = d.id ORDER BY e.id`
+                    );
                 console.table(employees);
             }
 
@@ -256,6 +268,18 @@ async function main() {
                     }
                 );
                 await query(`DELETE FROM department WHERE id=?`, answer.id);
+                console.log("-----Department DELETED!-----\n");
+            }
+              else if (deleteOption === 'Employees') {
+                const answer = await inquirer.prompt(
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'Which employee you want Delete?',
+                        choices: employeeList
+                    }
+                );
+                await query(`DELETE FROM employees WHERE id=?`, answer.id);
                 console.log("-----Department DELETED!-----\n");
             }
         }
