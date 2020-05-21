@@ -28,14 +28,13 @@ ____
         $ npm install console.table
 
 
-##  Screenshots
+##  Video Demo of app
+![Demo](./demo.gif)
 
 # Links to Project
 
 #### GitHub
- GitHub repository  URL
- 
-    https://rumardas.github.io/employ_tracker/.
+ [GitHub repository](https://rumardas.github.io/employ_tracker/)
 
 ### Run Server
 
