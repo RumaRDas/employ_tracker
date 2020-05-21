@@ -154,7 +154,7 @@ async function main() {
                 {
                     name: 'department_id',
                     type: 'list',
-                    message: 'Which Department you want add ?',
+                    message: 'In which department is the new employee add ',
                     choices: departmentList
                 },
 
@@ -180,7 +180,7 @@ async function main() {
                 console.table(department);
             }
             else if (viewOption === 'Roles') {
-                const roles = await query(`SELECT roles.id, roles.title, roles.salary, department.name FROM roles  inner join department on roles.department_id = department.id `);
+                const roles = await query(`SELECT roles.id, roles.title, roles.salary, department.name FROM roles  LEFT JOIN  department on roles.department_id = department.id `);
                 console.table(roles);
             }
             else if (viewOption === 'Employees') {
