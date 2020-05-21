@@ -300,7 +300,20 @@ async function main() {
                     }
                 );
                 await query(`DELETE FROM employees WHERE id=?`, answer.id);
-                console.log("-----Department DELETED!-----\n");
+                console.log("-----EMPLOYEE DELETED!-----\n");
+            }
+            //Deleting Department
+            else if (deleteOption === 'Roles') {
+                const answer = await inquirer.prompt(
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'What is the Role Want to update?',
+                        choices: roleList
+                    },
+                );
+                await query(`DELETE FROM roles WHERE id=?`, answer.id);
+                console.log("-----ROLES DELETED!-----\n");
             }
         }
         //Exit Application
