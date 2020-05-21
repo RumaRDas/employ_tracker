@@ -36,6 +36,7 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId);
 
 });
+
 //Getting employees
 const employeeList = async function () {
     const employeeresults = await query(`SELECT  * from employees `);
@@ -47,6 +48,7 @@ const employeeList = async function () {
     })
     return choices;
 }
+//Getting Roles
 const roleList = async function () {
     const roleresults = await query(`SELECT  * from roles `);
     const choices = roleresults.map(roles => {
@@ -57,7 +59,7 @@ const roleList = async function () {
     })
     return choices;
 }
-
+//getting departments
 const departmentList = async function () {
     const departmentresults = await query(`SELECT  * from department `);
     const choices = departmentresults.map(department => {
@@ -77,15 +79,15 @@ async function main() {
 
     // Forever! Keep asking questions, or at least until we ask to 'exit'.
     while (true) {
-        const { employee_tracker } = await inquirer.prompt({
-            name: 'employee_tracker',
+        const { option } = await inquirer.prompt({
+            name: 'option',
             type: 'list',
             message: 'What would you like to do ?',
             choices: ['Add', 'View', 'Update', 'Delete', 'Exit'],
 
         });
         //Adding Department
-        if (employee_tracker === 'Add') {
+        if (option === 'Add') {
             const { addEmployee } = await inquirer.prompt({
                 name: 'addEmployee',
                 type: 'list',
@@ -97,7 +99,7 @@ async function main() {
                 const answer = await inquirer.prompt({
                     name: 'name',
                     type: 'input',
-                    message: 'Department name You want to add?'
+                    message: 'What is the name of the new department?'
                 });
                 await query(`INSERT INTO department(name) VALUES(?)`,
                     [answer.name]
@@ -109,18 +111,18 @@ async function main() {
                 const answer = await inquirer.prompt([{
                     name: 'title',
                     type: 'input',
-                    message: 'Whats Roles You want to add?'
+                    message: 'What is the name of new role??'
                 },
                 {
                     name: 'salary',
                     type: 'input',
-                    message: 'Whats the salary of that role?'
+                    message: 'What is the salary of new role??'
 
                 },
                 {
                     name: 'department_id',
                     type: 'list',
-                    message: 'Which Department you want add ?',
+                    message: 'In which department is the new role?',
                     choices: departmentList
                 },
                 ]);
@@ -136,25 +138,19 @@ async function main() {
                 const answer = await inquirer.prompt([{
                     name: 'first_name',
                     type: 'input',
-                    message: 'First Name of employee'
+                    message: 'What is the employee first name?'
                 },
                 {
                     name: 'last_name',
                     type: 'input',
-                    message: 'Last Name of employee'
+                    message: 'What is the employee last Name?'
                 },
                 {
                     name: 'roles',
                     type: 'list',
-                    message: 'Which Roles you want add ?',
+                    message: 'What is the employee title?',
                     choices: roleList
                 },
-                // {
-                //     name: 'salary',
-                //     type: 'input',
-                //     message: 'Salary Amount ?',
-
-                // },
                 {
                     name: 'department_id',
                     type: 'list',
@@ -166,13 +162,12 @@ async function main() {
                 await query(
                     `INSERT INTO employees(first_name, last_name, roles_id, manager_id)VALUES(?,?,?,?)`,
                     [answer.first_name, answer.last_name, answer.roles, answer.department_id]
-                    
-
                 );
                 console.log("-----Employee added!-----\n");
             }
         }
-        else if (employee_tracker === 'View') {
+        //View Option
+        else if (option === 'View') {
             const { viewOption } = await inquirer.prompt({
                 name: 'viewOption',
                 type: 'list',
@@ -198,7 +193,7 @@ async function main() {
 
         }
         //Updating Employee List
-        else if (employee_tracker === 'Update') {
+        else if (option === 'Update') {
             const { updateOption } = await inquirer.prompt({
                 name: 'updateOption',
                 type: 'list',
@@ -250,7 +245,7 @@ async function main() {
             }
         }
         //Deleting Employee List
-        else if (employee_tracker === 'Delete') {
+        else if (option === 'Delete') {
             const { deleteOption } = await inquirer.prompt({
                 name: 'deleteOption',
                 type: 'list',
@@ -284,7 +279,7 @@ async function main() {
             }
         }
         //Exit Application
-        else if (employee_tracker === 'Exit') {
+        else if (option === 'Exit') {
             console.log("----------All done!------------------");
             connection.end();
             process.exit();
