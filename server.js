@@ -185,12 +185,10 @@ async function main() {
             }
             else if (viewOption === 'Employees') {
                 const employees = await query(
-                    // `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e join roles r ON e.manager_id = r.id join department d ON r.id = d.id`
                     `SELECT CONCAT(first_name, ' ',last_name) AS Name, title AS Role, salary, name AS Department FROM employees e LEFT JOIN roles r ON e.roles_id = r.id  LEFT JOIN department d ON e.roles_id = d.id ORDER BY e.id`
                     );
                 console.table(employees);
             }
-
         }
         //Updating Employee List
         else if (option === 'Update') {
@@ -200,7 +198,8 @@ async function main() {
                 message: 'What Do you Want to Update?',
                 choices: ['Department', 'Roles', 'Employees'],
             });
-
+            
+            //Update Department
             if (updateOption === 'Department') {
                 const answer = await inquirer.prompt([
                     {
@@ -225,7 +224,7 @@ async function main() {
                     {
                         name: 'id',
                         type: 'list',
-                        message: 'First Name of employee',
+                        message: 'Select employees name to update',
                         choices: employeeList
                     },
                     {    name:'newFName',
@@ -241,8 +240,32 @@ async function main() {
                 ]);
                 await query(`UPDATE employees SET first_name=?, last_name=? WHERE id=?`, [answer.newFName,answer.newLName, answer.id]);
 
-                console.log("-----Department UPDATED!-----\n");
+                console.log("-----EMPLOYEE UPDATED!-----\n");
             }
+             //Update Roles
+            else  if (updateOption === 'Roles') {
+                const answer = await inquirer.prompt([
+                    {
+                        name: 'id',
+                        type: 'list',
+                        message: 'What is the Role Want to update?',
+                        choices: roleList
+                    },
+                    {
+                        name: 'newRole',
+                        type: 'input',
+                        message: 'Whats the new Role ?',
+                    },
+                    {
+                        name: 'salary',
+                        type: 'input',
+                        message: 'Whats the new Salary for new Role ?',
+                    }
+                ]);
+                await query(`UPDATE roles SET title=?, salary =? WHERE id=?`, [answer.newRole,answer.salary, answer.id]);
+
+                console.log("-----ROLES UPDATED!-----\n");
+            } 
         }
         //Deleting Employee List
         else if (option === 'Delete') {
@@ -263,8 +286,10 @@ async function main() {
                     }
                 );
                 await query(`DELETE FROM department WHERE id=?`, answer.id);
-                console.log("-----Department DELETED!-----\n");
+                console.log("-----DEPARTMENT DELETED!-----\n");
             }
+
+            //DELETE Employes
               else if (deleteOption === 'Employees') {
                 const answer = await inquirer.prompt(
                     {
